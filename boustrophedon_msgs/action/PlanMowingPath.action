@@ -1,0 +1,5 @@
+geometry_msgs/PolygonStamped property
+geometry_msgs/PoseStamped robot_position
+---
+boustrophedon_msgs/StripingPlan plan
+---

@@ -1,0 +1,60 @@
+---
+Checks:          '*,
+                  -llvm-header-guard,
+                  -google-build-using-namespace,
+                  -clang-analyzer-alpha.clone.CloneChecker,
+                  -google-runtime-int,
+                  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+                  -cppcoreguidelines-pro-bounds-constant-array-index,
+                  -clang-analyzer-alpha.deadcode.UnreachableCode,
+                  -misc-use-after-move,
+                  -cppcoreguidelines-pro-type-vararg,
+                  -modernize-use-emplace,
+                  -android-*,
+                  -absel-*,
+                  -cert-*,
+                  -objc-*,
+                  -zircon-*,
+                  -hicpp-vararg,
+                  -hicpp-no-array-decay,
+                  -google-runtime-references,
+                  -llvm-include-order,
+                  -fuchsia-*,
+                  -misc-unused-parameters'
+
+WarningsAsErrors: '*'
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+CheckOptions:
+  - key:             llvm-namespace-comment.ShortNamespaceLines
+    value:           '10'
+  - key:             llvm-namespace-comment.SpacesBeforeComments
+    value:           '2'
+  - key:             readability-braces-around-statements.ShortStatementLines
+    value:           '2'
+  # type names
+  - key:             readability-identifier-naming.ClassCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.EnumCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.UnionCase
+    value:           CamelCase
+  # method names are camelCase
+  - key:             readability-identifier-naming.MethodCase
+    value:           camelBack
+  # variable names are snake_case
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ParameterCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ClassMemberSuffix
+    value:           '_'
+  # global variables are g_snake_case
+  - key:             readability-identifier-naming.GlobalVariablePrefix
+    value:           g_
+  - key:             readability-identifier-naming.GlobalVariableCase
+    value:           lower_case
+  # namespaces are snake_case
+  - key:             readability-identifier-naming.NamespaceCase
+    value:           lower_case
+...

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>boustrophedon_msgs</name>
+    <version>0.0.1</version>
+    <description>Custom messages for the Boustrophedon Planner</description>
+
+    <maintainer email="cbq@greenzie.com">Charles Brian Quinn</maintainer>
+    <maintainer email="oswinso@gmail.com">Oswin So</maintainer>
+
+    <license>TODO</license>
+
+    <author email="cbq@greenzie.com">Charles Brian Quinn</author>
+    <author email="oswinso@gmail.com">Oswin So</author>
+
+    <depend>actionlib_msgs</depend>
+    <depend>nav_msgs</depend>
+    <depend>geometry_msgs</depend>
+
+    <build_depend>message_generation</build_depend>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <export>
+    </export>
+</package>

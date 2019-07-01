@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>boustrophedon_server</name>
+    <version>0.0.1</version>
+    <description>Actionlib server for the Boustrophedon Planner</description>
+
+    <maintainer email="cbq@greenzie.com">Charles Brian Quinn</maintainer>
+    <maintainer email="oswinso@gmail.com">Oswin So</maintainer>
+
+
+    <license>TODO</license>
+
+
+    <author email="cbq@greenzie.co">Charles Brian Quinn</author>
+    <author email="oswin@gmail.com">Oswin So</author>
+
+    <depend>roscpp</depend>
+    <depend>boustrophedon_msgs</depend>
+    <depend>geometry_msgs</depend>
+    <depend>nav_msgs</depend>
+    <depend>actionlib</depend>
+    <depend>tf</depend>
+    <depend>rosparam_shortcuts</depend>
+
+    <build_depend>cgal</build_depend>
+
+    <test_depend>rosunit</test_depend>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <export>
+    </export>
+</package>

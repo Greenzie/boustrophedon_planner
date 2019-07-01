@@ -1,0 +1,3 @@
+boustrophedon_msgs/StripingPlan plan
+---
+nav_msgs/Path path
