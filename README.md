@@ -4,3 +4,7 @@ Boustrophedon Planner is a coverage path planner that implements the [Boustrophe
 ## Overview
 The path planner is an actionlib server that takes in a `geometry_msgs/PolygonStamped` and a `geometry_msgs/PoseStamped`,
 and returns a `StripingPlan` message which contains a list of waypoints to stripe the passed in polygon.
+
+## License
+
+This library is released under the [MIT License](https://opensource.org/licenses/MIT).
