@@ -9,4 +9,4 @@ and returns a `StripingPlan` message which contains a list of waypoints to strip
 
 ## License
 
-This library is released under the [MIT License](https://opensource.org/licenses/MIT).
+This library is released under the [MIT License](https://opensource.org/licenses/MIT) by [Greenzie](https://www.greenzie.com/). See License for full details.
