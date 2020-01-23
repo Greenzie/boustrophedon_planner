@@ -9,7 +9,7 @@ and returns a `StripingPlan` message which contains a list of waypoints to strip
 
 ## Changelog
 
-- Janurary 23, 2020:
+- January 23, 2020:
   - The boustrophedon planner can now handle all types of simple polygons that it is given, both convex and concave.
   - Inner boundaries are supported, allowing the planner to create paths at a certain offset from the initial given boundary.
   - "Half - Y" turns are supported, allowing for some curvature at the start / end of paths to assist robots that are not      completely holonomic.
