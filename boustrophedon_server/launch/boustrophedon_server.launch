@@ -1,7 +1,20 @@
 <launch>
-    <node pkg="boustrophedon_server" name="boustrophedon_server" type="boustrophedon_server" output="screen" >
-        <param name="outline_layer_count" value="1"/>
+    <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server"  output="screen" >
+        <param name="repeat_boundary" value="false"/>
+        <param name="outline_clockwise" value="true"/>
+        <param name="skip_outlines" value="true"/>
+        <param name="outline_layer_count" value="0"/>
         <param name="stripe_separation" value="1.0"/>
+        <param name="intermediary_separation" value="0.0"/>
         <param name="stripe_angle" value="0.0"/>
+        <param name="enable_stripe_angle_orientation" value="true" />
+        <param name="travel_along_boundary" value="true" />
+        <param name="allow_points_outside_boundary" value="false" />
+        <!-- Note: if enabling half-y turns, must have an outline_layer_count >= 1 -->
+        <param name="enable_half_y_turns" value="false" />
+        <param name="points_per_turn" value="15" />
+        <param name="turn_start_offset" value="0.5" />
+        <param name="publish_polygons" value="true"/>
+        <param name="publish_path_points" value="true"/>
     </node>
 </launch>

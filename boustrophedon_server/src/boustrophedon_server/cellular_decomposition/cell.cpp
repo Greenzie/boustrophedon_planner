@@ -1,147 +1,147 @@
-#include <boustrophedon_server/cellular_decomposition/cell.h>
+#include "boustrophedon_server/cellular_decomposition/cell.h"
 
 using namespace bcd;
 
-Vertex::Vertex(Event type, Circulator point) : type{ type }, point{ point }
+Cell::Cell(const Polygon& polygon)
 {
-}
-
-bool Vertex::isAdjacentTo(const Vertex& other) const
-{
-  return *(point + 1) == *other.point || *(point - 1) == *other.point;
-}
-
-Circulator Vertex::nextPoint() const
-{
-  return point + 1;
-}
-
-Circulator Vertex::previousPoint() const
-{
-  return point - 1;
-}
-
-std::ostream& operator<<(std::ostream& out, Event event)
-{
-  std::string string;
-  switch (event)
-  {
-    case Event::Start:
-      string = std::string("Start");
-      break;
-    case Event::End:
-      string = std::string("End");
-      break;
-    case Event::Open:
-      string = std::string("Open");
-      break;
-    case Event::Close:
-      string = std::string("Close");
-      break;
-    case Event::Ceil:
-      string = std::string("Ceil");
-      break;
-    case Event::Floor:
-      string = std::string("Floor");
-      break;
-  }
-  out << string;
-  return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const Vertex& vertex)
-{
-  out << *vertex.point << ": " << vertex.type;
-  return out;
-}
-
-Cell::Cell(Vertex start) : start{ std::move(start) }
-{
-}
-
-bool Cell::connectsToFloor(const Vertex& other) const
-{
-  bool connects_to_start_floor = floor_points.empty() && start.isAdjacentTo(other);
-  bool connects_to_end_floor = !floor_points.empty() && floor_points.back().isAdjacentTo(other);
-  return connects_to_start_floor || connects_to_end_floor;
-}
-
-bool Cell::connectsToCeil(const Vertex& other) const
-{
-  bool connects_to_start_ceil = ceiling_points.empty() && start.isAdjacentTo(other);
-  bool connects_to_end_ceil = !ceiling_points.empty() && ceiling_points.back().isAdjacentTo(other);
-  return connects_to_start_ceil || connects_to_end_ceil;
-}
-
-bool Cell::enclosesVector(const Vertex& other) const
-{
-  auto top_point = currentCeil().point;
-  auto bottom_point = currentFloor().point;
-
-  return bottom_point->y() < other.point->y() && other.point->y() < top_point->y();
-}
-
-const Vertex& Cell::currentCeil() const
-{
-  return ceiling_points.empty() ? start : ceiling_points.back();
-}
-
-const Vertex& Cell::currentFloor() const
-{
-  return floor_points.empty() ? start : floor_points.back();
-}
-
-const Point Cell::nextCeilPoint() const
-{
-  return *(currentCeil().point - 1);
-}
-
-const Point Cell::nextFloorPoint() const
-{
-  return *(currentFloor().point + 1);
-}
-
-std::vector<Point> Cell::toPoints() const
-{
-  std::vector<Point> points;
-  points.reserve(2 + floor_points.size() + ceiling_points.size());
-  points.emplace_back(*start.point);
-  std::transform(floor_points.begin(), floor_points.end(), std::back_inserter(points),
-                 [](const Vertex& vertex) { return *vertex.point; });
-  points.emplace_back(*end.point);
-  std::transform(ceiling_points.rbegin(), ceiling_points.rend(), std::back_inserter(points),
-                 [](const Vertex& vertex) { return *vertex.point; });
-  return points;
+  points.insert(points.begin(), polygon.vertices_begin(), polygon.vertices_end());
 }
 
 Polygon Cell::toPolygon() const
 {
   Polygon polygon;
-  auto points = toPoints();
   polygon.insert(polygon.vertices_end(), points.begin(), points.end());
   return polygon;
 }
 
+void Cell::insertPointOnEdge(const Point& point)
+{
+  // use the function in cgal_utils
+  Polygon polygon = toPolygon();
+  insertPointAlongEdge(point, polygon);
+
+  points = std::vector<Point>();
+  points.insert(points.begin(), polygon.vertices_begin(), polygon.vertices_end());
+}
+
+bool Cell::isPointOnEdge(const Point& point)
+{
+  Polygon polygon = toPolygon();
+  auto edge_iterator = polygon.edges_begin();
+  for (; edge_iterator != polygon.edges_end(); edge_iterator++)
+  {
+    Segment edge = *edge_iterator;
+    // check the point's distance to the edge - it might be off by a little bit because of floating point error
+    if (definitelyLessThan(CGAL::squared_distance(point, edge), EPSILON, EPSILON))
+    {
+      // it's on the edge
+      return true;
+    }
+  }
+  // it wasn't on any of the edges
+  return false;
+}
+
+// check if this cell is adjacent to other cell, aka shares two vertices
+bool Cell::isAdjacentTo(const bcd::Cell& other)
+{
+  int same_points_count = 0;
+  // loop through every point in this cell
+  for (auto& point : points)
+  {
+    // loop through every point in other cell
+    for (const auto& other_point : other.points)
+    {
+      if (approximatelyEqual(point, other_point, EPSILON))
+      {
+        same_points_count++;
+      }
+    }
+  }
+
+  // if there were two point shared between these cells, they're adjacent
+  if (same_points_count == 2)
+  {
+    return true;
+  }
+  else if (same_points_count > 2)
+  {
+    std::cout << "somehow two cells were adjacent on " << same_points_count << " points!" << std::endl;
+  }
+
+  return false;
+}
+
+bool Cell::canMergeWith(const std::vector<Cell>& cells)
+{
+  // check if this cell can merge with the given list of cells
+  // we check this by checking if any cell has points >= smallest x of this cell and points <= largest x of this cell
+  // in addition, the cell has to be adjacent to at least one other cell
+
+  // check for the case where there are no cells in the current list:
+  if (cells.size() == 0)
+  {
+    return true;
+  }
+
+  // get the left and right vertex
+  double min_x = std::numeric_limits<double>::max();
+  double max_x = std::numeric_limits<double>::lowest();  // min() is smallest positive value, lowest() is -max()
+
+  for (const Point& point : points)
+  {
+    if (point.x() < min_x)
+    {
+      min_x = point.x();
+    }
+    if (point.x() > max_x)
+    {
+      max_x = point.x();
+    }
+  }
+
+  bool has_adjacent_cell = false;
+  // check to see if any points in the given vector violate the above rule
+  for (const Cell& cell : cells)
+  {
+    // record to see if there are any points in this cell > min_x and and points < max_x
+    bool has_larger_point = false;
+    bool has_smaller_point = false;
+
+    for (const Point& point : cell.points)
+    {
+      if (definitelyGreaterThan(point.x(), min_x, EPSILON))
+      {
+        has_larger_point = true;
+      }
+      if (definitelyLessThan(point.x(), max_x, EPSILON))
+      {
+        has_smaller_point = true;
+      }
+      // if both conditions have been violated, this cell shares the same x space as the given list, so it can't merge
+      if (has_larger_point && has_smaller_point)
+      {
+        return false;
+      }
+    }
+
+    // no conflict with this cell, but let's check to see if it's adjacent
+    if (isAdjacentTo(cell))
+    {
+      has_adjacent_cell = true;
+    }
+  }
+
+  // if we reached here then this cell should be fine to merge...assuming there was at least one adjacent cell!
+  return has_adjacent_cell;
+}
+
 std::ostream& operator<<(std::ostream& out, const bcd::Cell& cell)
 {
-  out << cell.start;
-  for (const auto& vertex : cell.floor_points)
+  for (const auto& vertex : cell.points)
   {
-    out << ", " << vertex;
+    out << vertex << ", ";
   }
-  out << ", " << cell.end;
-  for (auto vertex = cell.ceiling_points.rbegin(); vertex != cell.ceiling_points.rend(); vertex++)
-  {
-    out << ", " << *vertex;
-  }
-
-  out << std::endl << "neigbours: ";
-
-  for (const auto& neighbour : cell.neighbors)
-  {
-    out << neighbour->start << " -> " << neighbour->end << std::endl;
-  }
-  out << std::endl;
 
   return out;
 }

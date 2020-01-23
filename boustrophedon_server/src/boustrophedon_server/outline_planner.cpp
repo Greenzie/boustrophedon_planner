@@ -1,12 +1,12 @@
 #include <CGAL/create_offset_polygons_2.h>
-#include <boustrophedon_server/outline_planner.h>
+#include "boustrophedon_server/outline_planner.h"
 
 void OutlinePlanner::setParameters(OutlinePlanner::Parameters parameters)
 {
   params_ = parameters;
 }
 
-void OutlinePlanner::addToPath(Polygon polygon, const Point& robot_position, std::vector<NavPoint>& path,
+bool OutlinePlanner::addToPath(Polygon polygon, const Point& robot_position, std::vector<NavPoint>& path,
                                Polygon& innermost_polygon)
 {
   shiftPolygonToStartNearRobot(polygon, robot_position);
@@ -15,30 +15,77 @@ void OutlinePlanner::addToPath(Polygon polygon, const Point& robot_position, std
   {
     polygon.reverse_orientation();
   }
-
-  // Add outermost outline
-  if (params_.outline_layers >= 1)
-  {
-    for (const auto& point : polygon.container())
-    {
-      path.emplace_back(PointType::Outline, point);
-    }
-    path.emplace_back(PointType::Outline, polygon.container().front());
-  }
   innermost_polygon = polygon;
-  for (auto layer = 1; layer < params_.outline_layers; layer++)
+
+  if (params_.skip_outlines)
+  {
+    std::cout << "Skipping outlining!" << std::endl;
+    return true;
+  }
+
+  if (params_.repeat_boundary)
+  {
+    if (!addOutermostOutline(path, polygon))
+    {
+      return false;
+    }
+  }
+
+  for (auto layer = 1; layer <= params_.outline_layers; layer++)
   {
     auto offset_distance = layer * params_.stripe_separation;
-    auto inner_polygons = CGAL::create_interior_skeleton_and_offset_polygons_2(offset_distance, polygon);
-    assert(!inner_polygons.empty());
-    for (const Point& p : inner_polygons.front()->container())
+    if (!addInnerOutline(path, polygon, offset_distance, innermost_polygon))
     {
-      path.emplace_back(PointType::Outline, p);
+      return false;
     }
-    // Close polygon by repeating first point
-    path.emplace_back(PointType::Outline, inner_polygons.front()->container().front());
-    innermost_polygon = *inner_polygons.front();
   }
+
+  return true;
+}
+
+bool OutlinePlanner::addOutermostOutline(std::vector<NavPoint>& path, const Polygon& polygon)
+{
+  // Add outermost outline
+  for (const auto& point : polygon.container())
+  {
+    path.emplace_back(PointType::Outline, point);
+  }
+
+  if (params_.outline_clockwise)
+  {
+    // reverse the outline path to go clockwise instead, so that
+    // grass clippings go inside the boundary, not outside
+    std::reverse(++path.begin(), path.end());
+  }
+  // Close polygon by repeating first point
+  path.emplace_back(PointType::Outline, polygon.container().front());
+  return true;
+}
+
+bool OutlinePlanner::addInnerOutline(std::vector<NavPoint>& path, const Polygon& polygon, const double& offset,
+                                     Polygon& innermost_polygon)
+{
+  auto inner_polygons = CGAL::create_interior_skeleton_and_offset_polygons_2(offset, polygon);
+  if (inner_polygons.empty())
+  {
+    return false;
+  }
+  for (const Point& p : inner_polygons.front()->container())
+  {
+    path.emplace_back(PointType::Outline, p);
+  }
+
+  if (params_.outline_clockwise)
+  {
+    // reverse the outline path to go clockwise instead, so that
+    // grass clippings go inside the boundary, not outside
+    std::reverse(path.end() - inner_polygons.size(), path.end());
+  }
+
+  // Close polygon by repeating first point
+  path.emplace_back(PointType::Outline, inner_polygons.front()->container().front());
+  innermost_polygon = *inner_polygons.front();
+  return true;
 }
 
 void OutlinePlanner::shiftPolygonToStartNearRobot(Polygon& polygon, const Point& robot_position)

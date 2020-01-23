@@ -8,7 +8,7 @@ enum class PointType
   Outline = 0,
   StripeStart = 1,
   StripeEnd = 2,
-  Travel = 3
+  StripeIntermediate = 3
 };
 
 struct NavPoint
