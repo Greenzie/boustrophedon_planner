@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(boustrophedon_server)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp

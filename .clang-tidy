@@ -4,6 +4,7 @@ Checks:          '*,
                   -google-build-using-namespace,
                   -clang-analyzer-alpha.clone.CloneChecker,
                   -google-runtime-int,
+                  -google-readability-todo,
                   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
                   -cppcoreguidelines-pro-bounds-constant-array-index,
                   -clang-analyzer-alpha.deadcode.UnreachableCode,
@@ -20,9 +21,12 @@ Checks:          '*,
                   -google-runtime-references,
                   -llvm-include-order,
                   -fuchsia-*,
-                  -misc-unused-parameters'
-
-WarningsAsErrors: '*'
+                  -misc-unused-parameters,
+                  -hicpp-no-assembler,
+                  -readability-magic-numbers,
+                  -google-readability-namespace-comments,
+                  -llvm-namespace-comment'
+#WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 CheckOptions:
