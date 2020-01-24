@@ -5,7 +5,7 @@ Boustrophedon Planner is a coverage path planner that implements a modified cell
 The path planner is an actionlib server that takes in a `geometry_msgs/PolygonStamped` and a `geometry_msgs/PoseStamped`,
 and returns a `StripingPlan` message which contains a list of waypoints to stripe the passed in polygon.
 
-![Sample Boustrophedon Plan](sample_boustrophedon_plan.png)
+![Sample Boustrophedon Plan](half-y-turn-concave.png)
 
 ## Changelog
 
