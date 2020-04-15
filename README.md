@@ -17,4 +17,6 @@ and returns a `StripingPlan` message which contains a list of waypoints to strip
 
 ## License
 
-This library is released under the [MIT License](https://opensource.org/licenses/MIT) by [Greenzie](https://www.greenzie.com/). See License for full details.
+This repository is subject to GNU General Public License version 3 or later due to its dependencies.
+
+The geometric operations rely on CGAL which is restricted by GNU General Public License version 3 or later.
