@@ -7,6 +7,25 @@ and returns a `StripingPlan` message which contains a list of waypoints to strip
 
 ![Sample Boustrophedon Plan](half-y-turn-concave.png)
 
+### Instructions
+run the server using:
+```
+roslaunch boustrophedon_server boustrophedon_server.launch
+```
+
+The server waits for an actionlib service call of type `boustrophedon_msgs/PlanMowingPathGoal ` containing a `geometry_msgs/PolygonStamped`
+and a `geometry_msgs/PoseStamped`. It will then return the striping path in a `StripingPlan` message as the actionlib server result.
+
+For testing, you can use the client node by running:
+```
+rosrun boustrophedon_server boustrophedon_planner_client
+```
+
+The client loads a hard-coded polygon. It then waits for a message over the `/initialpose` topic (can be sent using rviz `2D Pose Estimate`).
+Once sent, the client will get the result, conect it to path and publish it to `result_path`.
+The polygon is published to `input_polygon` for convenience.
+
+
 ## Changelog
 
 - January 23, 2020:
