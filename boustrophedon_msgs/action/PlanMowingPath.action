@@ -1,5 +1,8 @@
+# Goal Definition
 geometry_msgs/PolygonStamped property
 geometry_msgs/PoseStamped robot_position
 ---
+# Result Definition
 boustrophedon_msgs/StripingPlan plan
 ---
+# Feedback Definition
