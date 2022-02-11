@@ -8,6 +8,8 @@ BoustrophedonPlannerServer::BoustrophedonPlannerServer()
                    false)
   , conversion_server_{ node_handle_.advertiseService("convert_striping_plan_to_path",
                                                       &BoustrophedonPlannerServer::convertStripingPlanToPath, this) }
+  , produce_path_server_{ node_handle_.advertiseService("produce_plan", &BoustrophedonPlannerServer::producePlan,
+                                                        this) }
 {
   std::size_t error = 0;
   error += static_cast<std::size_t>(
@@ -73,15 +75,17 @@ BoustrophedonPlannerServer::BoustrophedonPlannerServer()
 
   if (publish_polygons_)
   {
-    initial_polygon_publisher_ = private_node_handle_.advertise<geometry_msgs::PolygonStamped>("initial_polygon", 1);
+    initial_polygon_publisher_ =
+        private_node_handle_.advertise<geometry_msgs::PolygonStamped>("initial_polygon", 1, true);
     preprocessed_polygon_publisher_ =
-        private_node_handle_.advertise<geometry_msgs::PolygonStamped>("preprocessed_polygon", 1);
+        private_node_handle_.advertise<geometry_msgs::PolygonStamped>("preprocessed_polygon", 1, true);
   }
   // mainly for use with plotJuggler, which wants the points to be put one at a time on the same topic
   if (publish_path_points_)
   {
-    path_points_publisher_ = private_node_handle_.advertise<geometry_msgs::PointStamped>("path_points", 1000);
-    polygon_points_publisher_ = private_node_handle_.advertise<geometry_msgs::PointStamped>("polygon_points", 1000);
+    path_points_publisher_ = private_node_handle_.advertise<geometry_msgs::PointStamped>("path_points", 1000, true);
+    polygon_points_publisher_ =
+        private_node_handle_.advertise<geometry_msgs::PointStamped>("polygon_points", 1000, true);
   }
 }
 
@@ -162,12 +166,13 @@ void BoustrophedonPlannerServer::executePlanPathAction(const boustrophedon_msgs:
     publishPathPoints(path);
     publishPolygonPoints(polygon);
   }
+  storeLatestPath(path);
   auto result = toResult(std::move(path), boundary_frame);
   action_server_.setSucceeded(result);
 }
 
 boustrophedon_msgs::PlanMowingPathResult BoustrophedonPlannerServer::toResult(std::vector<NavPoint>&& path,
-                                                                         const std::string& frame) const
+                                                                              const std::string& frame) const
 {
   boustrophedon_msgs::PlanMowingPathResult result;
   result.plan.points.reserve(path.size());
@@ -202,6 +207,15 @@ Point BoustrophedonPlannerServer::fromPositionWithFrame(const geometry_msgs::Pos
   geometry_msgs::PoseStamped transformed_pose;
   transform_listener_.transformPose(target_frame, pose, transformed_pose);
   return { transformed_pose.pose.position.x, transformed_pose.pose.position.y };
+}
+
+bool BoustrophedonPlannerServer::producePlan(boustrophedon_msgs::ProducePath::Request& request,
+                                             boustrophedon_msgs::ProducePath::Response& response)
+{
+  response.path.header.stamp = ros::Time::now();
+  response.path.header.frame_id = "map";
+  response.path.poses = stored_path_.poses;
+  return true;
 }
 
 bool BoustrophedonPlannerServer::convertStripingPlanToPath(boustrophedon_msgs::ConvertPlanToPath::Request& request,
@@ -287,5 +301,23 @@ void BoustrophedonPlannerServer::publishPolygonPoints(const Polygon& poly) const
     point.point.z = float(0.0);
     polygon_points_publisher_.publish(point);
     ros::spinOnce();
+  }
+}
+
+void BoustrophedonPlannerServer::storeLatestPath(const std::vector<NavPoint>& path)
+{
+  // Clear all previously stored paths
+  stored_path_.poses.clear();
+  for (NavPoint point : path)
+  {
+    geometry_msgs::PoseStamped pose_msg;
+    pose_msg.header.frame_id = "map";
+    pose_msg.header.stamp = ros::Time::now();
+    pose_msg.pose.position.x = point.point.x();
+    pose_msg.pose.position.y = point.point.y();
+
+    // Helps to normalise the orientation
+    pose_msg.pose.orientation.w = 1.0;
+    stored_path_.poses.push_back(pose_msg);
   }
 }

@@ -8,6 +8,7 @@
 
 #include <boustrophedon_msgs/PlanMowingPathAction.h>
 #include <boustrophedon_msgs/ConvertPlanToPath.h>
+#include <boustrophedon_msgs/ProducePath.h>
 #include <nav_msgs/Odometry.h>
 
 #include "boustrophedon_server/cgal_utils.h"
@@ -29,6 +30,7 @@ private:
   ros::NodeHandle private_node_handle_;
   Server action_server_;
   ros::ServiceServer conversion_server_;
+  ros::ServiceServer produce_path_server_;
   ros::Publisher initial_polygon_publisher_;
   ros::Publisher preprocessed_polygon_publisher_;
   ros::Publisher path_points_publisher_;
@@ -53,9 +55,18 @@ private:
   tf::TransformListener transform_listener_{};
   bool publish_polygons_{};
   bool publish_path_points_{};
+  nav_msgs::Path stored_path_;
 
   bool convertStripingPlanToPath(boustrophedon_msgs::ConvertPlanToPath::Request& request,
                                  boustrophedon_msgs::ConvertPlanToPath::Response& response);
+
+  /**
+   * @brief Produce a complete nav_msgs/Path based on the latest stiping path 
+   * 
+   */
+  bool producePlan(boustrophedon_msgs::ProducePath::Request& request,
+                                             boustrophedon_msgs::ProducePath::Response& response);
+  
   boustrophedon_msgs::PlanMowingPathResult toResult(std::vector<NavPoint>&& path, const std::string& frame) const;
   Polygon fromBoundary(const geometry_msgs::PolygonStamped& boundary) const;
   Point fromPositionWithFrame(const geometry_msgs::PoseStamped& pose, const std::string& target_frame) const;
@@ -64,6 +75,14 @@ private:
   geometry_msgs::PolygonStamped convertCGALPolygonToMsg(const Polygon& poly) const;
   void publishPathPoints(const std::vector<NavPoint>& path) const;
   void publishPolygonPoints(const Polygon& poly) const;
+
+  /**
+   * @brief Store the latest plan generated in a nav_msgs/Path container
+   * 
+   * @param path 
+   */
+  void storeLatestPath(const std::vector<NavPoint>& path);
+
 };
 
 #endif  // SRC_BOUSTROPHEDON_PLANNER_SERVER_H
