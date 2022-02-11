@@ -80,6 +80,9 @@ BoustrophedonPlannerServer::BoustrophedonPlannerServer()
     preprocessed_polygon_publisher_ =
         private_node_handle_.advertise<geometry_msgs::PolygonStamped>("preprocessed_polygon", 1, true);
   }
+
+  recent_path_publisher_ = private_node_handle_.advertise<nav_msgs::Path>("recent_path_publisher", 1, true);
+
   // mainly for use with plotJuggler, which wants the points to be put one at a time on the same topic
   if (publish_path_points_)
   {
@@ -167,6 +170,9 @@ void BoustrophedonPlannerServer::executePlanPathAction(const boustrophedon_msgs:
     publishPolygonPoints(polygon);
   }
   storeLatestPath(path);
+  stored_path_.header.stamp = ros::Time::now();
+  stored_path_.header.frame_id = "map";
+  recent_path_publisher_.publish(stored_path_);
   auto result = toResult(std::move(path), boundary_frame);
   action_server_.setSucceeded(result);
 }

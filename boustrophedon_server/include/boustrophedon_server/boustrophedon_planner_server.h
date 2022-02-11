@@ -35,6 +35,7 @@ private:
   ros::Publisher preprocessed_polygon_publisher_;
   ros::Publisher path_points_publisher_;
   ros::Publisher polygon_points_publisher_;
+  ros::Publisher recent_path_publisher_;
 
   StripingPlanner striping_planner_;
   OutlinePlanner outline_planner_;
