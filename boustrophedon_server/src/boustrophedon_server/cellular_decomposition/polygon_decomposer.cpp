@@ -1,4 +1,3 @@
-#include <ros/assert.h>
 #include "boustrophedon_server/cellular_decomposition/polygon_decomposer.h"
 
 using namespace bcd;
@@ -382,7 +381,6 @@ std::vector<Cell>::iterator PolygonDecomposer::findWorkingCell(const Point& uppe
   }
 
   // if we haven't found the working cell by here, something didn't work properly.
-  ROS_WARN_STREAM("couldn't find working cell!");
   return cell_iterator;  // this will be cells_end();
 }
 

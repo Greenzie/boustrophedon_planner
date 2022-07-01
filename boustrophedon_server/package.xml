@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
     <name>boustrophedon_server</name>
     <version>0.0.1</version>
     <description>Actionlib server for the Boustrophedon Planner</description>
@@ -7,27 +7,29 @@
     <maintainer email="cbq@greenzie.com">Charles Brian Quinn</maintainer>
     <maintainer email="oswinso@gmail.com">Oswin So</maintainer>
 
-
     <license>GPLv3</license>
-
 
     <author email="cbq@greenzie.co">Charles Brian Quinn</author>
     <author email="oswin@gmail.com">Oswin So</author>
     <author email="matthew.barulic@gmail.com">Matthew Barulic</author>
 
-    <depend>roscpp</depend>
+    <buildtool_depend>ament_cmake</buildtool_depend>
+
+    <depend>rclcpp</depend>
     <depend>boustrophedon_msgs</depend>
     <depend>geometry_msgs</depend>
     <depend>nav_msgs</depend>
-    <depend>actionlib</depend>
-    <depend>tf</depend>
-    <depend>rosparam_shortcuts</depend>
+    <depend>actionlib_msgs</depend>
+    <depend>tf2</depend>
 
     <build_depend>cgal</build_depend>
 
-    <test_depend>rosunit</test_depend>
+    <test_depend>ament_lint_auto</test_depend>
+    <test_depend>ament_lint_common</test_depend>
 
-    <buildtool_depend>catkin</buildtool_depend>
+    <exec_depend>ros2launch</exec_depend>
+
     <export>
+      <build_type>ament_cmake</build_type>
     </export>
 </package>
