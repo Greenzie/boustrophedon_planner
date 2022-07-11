@@ -45,11 +45,12 @@ private:
   bool repeat_boundary_;
   bool outline_clockwise_;
   bool skip_outlines_;
-  bool enable_orientation_;
   int outline_layer_count_;
   double stripe_separation_;
   double intermediary_separation_;
   double stripe_angle_;
+  bool stripe_angle_from_robot_orientation;
+  bool stripe_angle_from_boundary_orientation;
   bool travel_along_boundary_;
   bool allow_points_outside_boundary_;
   bool enable_half_y_turns_;
@@ -71,6 +72,7 @@ private:
   Point fromPositionWithFrame(const geometry_msgs::msg::PoseStamped& pose, const std::string& target_frame) const;
   bool checkPolygonIsValid(const Polygon& poly) const;
   double getStripeAngleFromOrientation(const geometry_msgs::msg::PoseStamped& robot_position);
+  double getPolygonOrientation(const Polygon& poly);
   geometry_msgs::msg::PolygonStamped convertCGALPolygonToMsg(const Polygon& poly) const;
   void publishPathPoints(const std::vector<NavPoint>& path);
   void publishPolygonPoints(const Polygon& poly);

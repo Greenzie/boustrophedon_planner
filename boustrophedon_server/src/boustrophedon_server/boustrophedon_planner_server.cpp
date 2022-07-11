@@ -40,8 +40,11 @@ BoustrophedonPlannerServer::BoustrophedonPlannerServer() : Node("boustrophedon_p
   declare_parameter("stripe_angle", 0.0);
   stripe_angle_ = get_parameter("stripe_angle").as_double();
 
-  declare_parameter("enable_stripe_angle_orientation", true);
-  enable_orientation_ = get_parameter("enable_stripe_angle_orientation").as_bool();
+  declare_parameter("stripe_angle_from_robot_orientation", false);
+  stripe_angle_from_robot_orientation = get_parameter("stripe_angle_from_robot_orientation").as_bool();
+
+  declare_parameter("stripe_angle_from_boundary_orientation", false);
+  stripe_angle_from_boundary_orientation = get_parameter("stripe_angle_from_boundary_orientation").as_bool();
 
   declare_parameter("travel_along_boundary", true);
   travel_along_boundary_ = get_parameter("travel_along_boundary").as_bool();
@@ -145,10 +148,6 @@ void BoustrophedonPlannerServer::executePlanPathAction(
   auto result = std::make_shared<PlanMowingPathAction::Result>();
 
   std::string boundary_frame = goal->property.header.frame_id;
-  if (enable_orientation_)
-  {
-    stripe_angle_ = getStripeAngleFromOrientation(goal->robot_position);
-  }
 
   Polygon polygon = fromBoundary(goal->property);
 
@@ -170,6 +169,25 @@ void BoustrophedonPlannerServer::executePlanPathAction(
     goal_handle->abort(result);
     return;
   }
+
+  if (stripe_angle_from_robot_orientation && !stripe_angle_from_boundary_orientation)
+  {
+    stripe_angle_ = getStripeAngleFromOrientation(goal->robot_position);
+  }
+  else if (!stripe_angle_from_robot_orientation && stripe_angle_from_boundary_orientation)
+  {
+    double orientation_wrt_x_axis = getPolygonOrientation(polygon);
+    RCLCPP_INFO(get_logger(), "Boundary orientation: %.2f", orientation_wrt_x_axis);
+    stripe_angle_ = M_PI / 2.0 - orientation_wrt_x_axis;
+  }
+  else if (stripe_angle_from_robot_orientation && stripe_angle_from_boundary_orientation)
+  {
+    RCLCPP_ERROR(get_logger(), "Both stripe_angle_from_robot_orientation and stripe_angle_from_boundary_orientation "
+                               "should not be enabled at the same time.");
+    goal_handle->abort(result);
+    return;
+  }
+
   Point robot_position;
   try
   {
@@ -324,6 +342,38 @@ double BoustrophedonPlannerServer::getStripeAngleFromOrientation(const geometry_
   RCLCPP_INFO(get_logger(), "Got Striping Angle from Orientation: %.2f", yaw);
   // TODO: Recalibrate the IMU so that we can get rid of this constant below.
   return yaw + 1.57079632679;  // Adds PI / 2 to account for incorrect IMU calibration / reference vector
+}
+
+// get the average polygon orientation
+double BoustrophedonPlannerServer::getPolygonOrientation(const Polygon& polygon)
+{
+  double best_angle = 0;
+  double max_scalar_product_sum = 0;
+
+  for (auto edge_candidate = polygon.edges_begin(); edge_candidate != polygon.edges_end(); ++edge_candidate)
+  {
+    Direction edge_candidate_dir = edge_candidate->direction();
+    double edge_candidate_angle = atan2(edge_candidate_dir.dy(), edge_candidate_dir.dx());
+
+    double scalar_product_sum = 0.0;
+
+    for (auto edge = polygon.edges_begin(); edge != polygon.edges_end(); ++edge)
+    {
+      Direction edge_dir = edge->direction();
+      double edge_angle = atan2(edge_dir.dy(), edge_dir.dx());
+      double edge_length = edge_dir.dx() * edge_dir.dx() + edge_dir.dy() * edge_dir.dy(); // sqrt is not necessary for this optimization
+
+      scalar_product_sum += edge_length * fabs(cos(edge_angle - edge_candidate_angle));
+    }
+
+    if (scalar_product_sum > max_scalar_product_sum)
+    {
+      best_angle = edge_candidate_angle;
+      max_scalar_product_sum = scalar_product_sum;
+    }
+  }
+
+  return best_angle;
 }
 
 // publishes the path points one at a time for visualization in plotJuggler
