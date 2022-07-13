@@ -26,6 +26,8 @@ void transformNavPoints(const std::vector<NavPoint>::iterator& first, const std:
 
 Polygon::Vertex_const_circulator getLeftVertex(const Polygon& polygon);
 
+int findNIntersections(const Polygon& polygon, const Direction& stripe_direction, double stripe_separation);
+
 std::vector<Point> getIntersectionPoints(const Polygon& polygon, const Line& line);
 
 std::vector<Point>::const_iterator findPointInVector(const Point& point, const std::vector<Point>& vector);

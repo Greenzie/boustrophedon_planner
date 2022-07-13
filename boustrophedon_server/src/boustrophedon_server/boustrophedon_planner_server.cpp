@@ -348,28 +348,17 @@ double BoustrophedonPlannerServer::getStripeAngleFromOrientation(const geometry_
 double BoustrophedonPlannerServer::getPolygonOrientation(const Polygon& polygon)
 {
   double best_angle = 0;
-  double max_scalar_product_sum = 0;
+  double min_intersections = DBL_MAX;
 
-  for (auto edge_candidate = polygon.edges_begin(); edge_candidate != polygon.edges_end(); ++edge_candidate)
+  for (double angle_candidate = 0; angle_candidate < M_PI; angle_candidate += M_PI / 180)
   {
-    Direction edge_candidate_dir = edge_candidate->direction();
-    double edge_candidate_angle = atan2(edge_candidate_dir.dy(), edge_candidate_dir.dx());
+    Direction dir(1, tan(angle_candidate));
+    int n_intersections = findNIntersections(polygon, dir, stripe_separation_);
 
-    double scalar_product_sum = 0.0;
-
-    for (auto edge = polygon.edges_begin(); edge != polygon.edges_end(); ++edge)
+    if (n_intersections < min_intersections)
     {
-      Direction edge_dir = edge->direction();
-      double edge_angle = atan2(edge_dir.dy(), edge_dir.dx());
-      double edge_length = edge_dir.dx() * edge_dir.dx() + edge_dir.dy() * edge_dir.dy(); // sqrt is not necessary for this optimization
-
-      scalar_product_sum += edge_length * fabs(cos(edge_angle - edge_candidate_angle));
-    }
-
-    if (scalar_product_sum > max_scalar_product_sum)
-    {
-      best_angle = edge_candidate_angle;
-      max_scalar_product_sum = scalar_product_sum;
+      best_angle = angle_candidate;
+      min_intersections = n_intersections;
     }
   }
 
