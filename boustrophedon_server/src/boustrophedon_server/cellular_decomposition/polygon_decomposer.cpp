@@ -222,6 +222,12 @@ bool PolygonDecomposer::findAbovePoint(Point& above, const Point& critical_point
     // reset it
     it = findPointInVector(critical_point, points);
 
+    if (it == points.end())
+    {
+        // the critical point has not been introduced
+        return false;
+    }
+
     // because points is not const, and findAbovePoint happens before findBelowPoint, we don't have to modify
     // findBelowPoint()
   }
