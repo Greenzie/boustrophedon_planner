@@ -15,6 +15,11 @@ void StripingPlanner::addToPath(const Polygon& polygon, const Polygon& sub_polyg
 
   fillPolygon(sub_polygon, new_path_section, robot_position);
 
+  if (new_path_section.empty())
+  {
+    return;
+  }
+
   if (params_.travel_along_boundary)
   {
     std::vector<NavPoint> start_to_striping =
