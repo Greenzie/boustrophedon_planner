@@ -1,5 +1,6 @@
 #include <CGAL/create_offset_polygons_2.h>
 #include <CGAL/Quotient.h>
+
 #include "boustrophedon_server/striping_planner.h"
 #include "boustrophedon_server/cgal_utils.h"
 

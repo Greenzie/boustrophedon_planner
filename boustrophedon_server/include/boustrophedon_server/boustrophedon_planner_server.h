@@ -1,19 +1,18 @@
 #ifndef SRC_BOUSTROPHEDON_PLANNER_SERVER_H
 #define SRC_BOUSTROPHEDON_PLANNER_SERVER_H
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_action/rclcpp_action.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
-
-#include <boustrophedon_msgs/action/plan_mowing_path.hpp>
-#include <boustrophedon_msgs/srv/convert_plan_to_path.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <nav_msgs/msg/odometry.h>
-#include "geometry_msgs/msg/point_stamped.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/polygon_stamped.hpp"
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/polygon_stamped.hpp>
 
+#include "boustrophedon_msgs/action/plan_mowing_path.hpp"
+#include "boustrophedon_msgs/srv/convert_plan_to_path.hpp"
 #include "boustrophedon_server/cgal_utils.h"
 #include "boustrophedon_server/striping_planner.h"
 #include "boustrophedon_server/outline_planner.h"

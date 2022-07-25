@@ -1,4 +1,5 @@
 #include <CGAL/create_offset_polygons_2.h>
+
 #include "boustrophedon_server/outline_planner.h"
 
 void OutlinePlanner::setParameters(OutlinePlanner::Parameters parameters)
