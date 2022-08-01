@@ -94,7 +94,7 @@ void BoustrophedonPlannerClient::send_goal()
     map.points.push_back(point);
   }
 
-  RCLCPP_INFO(get_logger(), "Creating polygon (%d):", map.points.size());
+  RCLCPP_INFO(get_logger(), "Creating polygon (%ld):", map.points.size());
 
   map_stamped.polygon = map;
   goal_msg.property = map_stamped;
@@ -130,10 +130,8 @@ void BoustrophedonPlannerClient::send_goal()
   this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
 }
 
-void BoustrophedonPlannerClient::goal_response_callback(
-    shared_future<GoalHandlePlanMowingPathAction::SharedPtr> future)
+void BoustrophedonPlannerClient::goal_response_callback(const GoalHandlePlanMowingPathAction::SharedPtr & goal_handle)
 {
-  auto goal_handle = future.get();
   if (!goal_handle)
   {
     RCLCPP_ERROR(this->get_logger(), "Goal was rejected by server");
@@ -145,12 +143,12 @@ void BoustrophedonPlannerClient::goal_response_callback(
 }
 
 void BoustrophedonPlannerClient::feedback_callback(GoalHandlePlanMowingPathAction::SharedPtr,
-                                                   const shared_ptr<const PlanMowingPathAction::Feedback> feedback)
+                                                   const std::shared_ptr<const PlanMowingPathAction::Feedback>)
 {
   RCLCPP_INFO(this->get_logger(), "Unexpected feedback received");
 }
 
-void BoustrophedonPlannerClient::result_callback(const GoalHandlePlanMowingPathAction::WrappedResult& result)
+void BoustrophedonPlannerClient::result_callback(const GoalHandlePlanMowingPathAction::WrappedResult & result)
 {
   switch (result.code)
   {

@@ -151,7 +151,7 @@ void BoustrophedonPlannerServer::executePlanPathAction(
 
   Polygon polygon = fromBoundary(goal->property);
 
-  RCLCPP_INFO(get_logger(), "Boundary limits (%d):", goal->property.polygon.points.size());
+  RCLCPP_INFO(get_logger(), "Boundary limits (%ld):", goal->property.polygon.points.size());
   for (Polygon::iterator vertex = polygon.begin(); vertex != polygon.end(); ++vertex)
   {
     RCLCPP_INFO(get_logger(), "(%.2f, %.2f)", vertex->x(), vertex->y());
@@ -221,7 +221,7 @@ void BoustrophedonPlannerServer::executePlanPathAction(
   RCLCPP_INFO(get_logger(), "Decomposing boundary polygon into sub-polygons...");
   polygon_decomposer.decompose(fill_polygon);
   std::vector<Polygon> sub_polygons = polygon_decomposer.getSubPolygons(robot_position);
-  RCLCPP_INFO(get_logger(), "Broke the boundary up into %d sub-polygons", sub_polygons.size());
+  RCLCPP_INFO(get_logger(), "Broke the boundary up into %ld sub-polygons", sub_polygons.size());
   Polygon merged_polygon;
   Point start_position = robot_position;
   for (const auto& subpoly : sub_polygons)

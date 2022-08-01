@@ -11,7 +11,7 @@
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <nav_msgs/msg/odometry.h>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -36,8 +36,8 @@ private:
   std::string boundary_file;
 
   void send_goal();
-  void goal_response_callback(std::shared_future<GoalHandlePlanMowingPathAction::SharedPtr> future);
-  void feedback_callback(GoalHandlePlanMowingPathAction::SharedPtr, const std::shared_ptr<const PlanMowingPathAction::Feedback> feedback);
+  void goal_response_callback(const GoalHandlePlanMowingPathAction::SharedPtr & goal_handle);
+  void feedback_callback(GoalHandlePlanMowingPathAction::SharedPtr, const std::shared_ptr<const PlanMowingPathAction::Feedback>);
   void result_callback(const GoalHandlePlanMowingPathAction::WrappedResult & result);
 };
 
