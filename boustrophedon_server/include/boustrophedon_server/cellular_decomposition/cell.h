@@ -2,9 +2,10 @@
 #define SRC_CELL_H
 
 #include <vector>
+#include <CGAL/squared_distance_2.h>
+
 #include "boustrophedon_server/cgal_utils.h"
 #include "boustrophedon_server/cgal_types.h"
-#include <CGAL/squared_distance_2.h>
 
 namespace bcd
 {
