@@ -1,4 +1,3 @@
-#include <ros/assert.h>
 #include "boustrophedon_server/cellular_decomposition/polygon_decomposer.h"
 
 using namespace bcd;
@@ -223,6 +222,12 @@ bool PolygonDecomposer::findAbovePoint(Point& above, const Point& critical_point
     // reset it
     it = findPointInVector(critical_point, points);
 
+    if (it == points.end())
+    {
+        // the critical point has not been introduced
+        return false;
+    }
+
     // because points is not const, and findAbovePoint happens before findBelowPoint, we don't have to modify
     // findBelowPoint()
   }
@@ -329,12 +334,17 @@ void PolygonDecomposer::sliceNewCell(const Point& upper, const Point& lower)
   new_cell.points.push_back(*it);
 
   // remove the points of new_cell (except upper and lower!) from the working cell
-  auto new_cell_iterator = new_cell.toPolygon().vertices_begin();
+  Polygon polygon = new_cell.toPolygon();
+  auto new_cell_iterator = polygon.vertices_begin();
   new_cell_iterator++;  // skip upper
-  for (; new_cell_iterator != new_cell.toPolygon().vertices_end() - 1; new_cell_iterator++)
+  for (; new_cell_iterator < polygon.vertices_end() - 1; new_cell_iterator++)
   {
     // for each point in the new cell, we need to remove it from the working cell
-    working_cell.points.erase(findPointInVector(*new_cell_iterator, working_cell.points));
+    std::vector<Point>::const_iterator occur = findPointInVector(*new_cell_iterator, working_cell.points);
+    if (occur != working_cell.points.end())
+    {
+        working_cell.points.erase(occur);
+    }
   }
 
   // In certain situations, the working cell could potentially only be a line. Just remove it if so.
@@ -382,7 +392,6 @@ std::vector<Cell>::iterator PolygonDecomposer::findWorkingCell(const Point& uppe
   }
 
   // if we haven't found the working cell by here, something didn't work properly.
-  ROS_WARN_STREAM("couldn't find working cell!");
   return cell_iterator;  // this will be cells_end();
 }
 

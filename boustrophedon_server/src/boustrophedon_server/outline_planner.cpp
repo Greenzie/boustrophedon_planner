@@ -1,4 +1,5 @@
 #include <CGAL/create_offset_polygons_2.h>
+
 #include "boustrophedon_server/outline_planner.h"
 
 void OutlinePlanner::setParameters(OutlinePlanner::Parameters parameters)
@@ -65,7 +66,8 @@ bool OutlinePlanner::addOutermostOutline(std::vector<NavPoint>& path, const Poly
 bool OutlinePlanner::addInnerOutline(std::vector<NavPoint>& path, const Polygon& polygon, const double& offset,
                                      Polygon& innermost_polygon)
 {
-  auto inner_polygons = CGAL::create_interior_skeleton_and_offset_polygons_2(offset, polygon);
+  Kernel kernel;
+  auto inner_polygons = CGAL::create_interior_skeleton_and_offset_polygons_2(offset, polygon, kernel, kernel);
   if (inner_polygons.empty())
   {
     return false;

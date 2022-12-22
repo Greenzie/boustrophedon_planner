@@ -57,6 +57,47 @@ Polygon::Vertex_const_circulator getLeftVertex(const Polygon& polygon)
   return left_vertex;
 }
 
+int translateLineAndFindNIntersections(const Polygon& polygon, const Line& line, double offset)
+{
+    double line_angle = atan2(line.y_at_x(1) - line.y_at_x(0), 1);
+    double line_angle_perp = M_PI/2 + line_angle;
+
+    Point base_point = line.point(0);
+    Point translated_point(base_point.x() + offset * cos(line_angle_perp), base_point.y() + offset * sin(line_angle_perp));
+    Line translated_line(translated_point, line.direction());
+    std::vector<Point> intersections = getIntersectionPoints(polygon, translated_line);
+    return intersections.size();
+}
+
+int findNIntersections(const Polygon& polygon, const Direction& stripe_direction, double stripe_separation)
+{
+  Point first_vertex = *polygon.begin();
+
+  int n_intersections = 0;
+
+  // Central stripe
+  Line central_line(first_vertex, stripe_direction);
+  n_intersections += translateLineAndFindNIntersections(polygon, central_line, 0);
+
+  // Sweep in one direction perpendicular to central_line
+  int new_intersections = -1;
+  for (auto stripe_num = 1; new_intersections != 0; stripe_num++)
+  {
+    new_intersections = translateLineAndFindNIntersections(polygon, central_line, stripe_num * stripe_separation);
+    n_intersections += new_intersections;
+  }
+
+  // Sweep in the opposite direction
+  new_intersections = -1;
+  for (auto stripe_num = 1; new_intersections != 0; stripe_num++)
+  {
+    new_intersections = translateLineAndFindNIntersections(polygon, central_line, -1 * stripe_num * stripe_separation);
+    n_intersections += new_intersections;
+  }
+
+  return n_intersections;
+}
+
 std::vector<Point> getIntersectionPoints(const Polygon& polygon, const Line& line)
 {
   std::vector<Point> intersections;

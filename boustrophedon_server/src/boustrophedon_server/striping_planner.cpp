@@ -1,5 +1,6 @@
 #include <CGAL/create_offset_polygons_2.h>
 #include <CGAL/Quotient.h>
+
 #include "boustrophedon_server/striping_planner.h"
 #include "boustrophedon_server/cgal_utils.h"
 
@@ -14,6 +15,11 @@ void StripingPlanner::addToPath(const Polygon& polygon, const Polygon& sub_polyg
   std::vector<NavPoint> new_path_section;
 
   fillPolygon(sub_polygon, new_path_section, robot_position);
+
+  if (new_path_section.empty())
+  {
+    return;
+  }
 
   if (params_.travel_along_boundary)
   {
