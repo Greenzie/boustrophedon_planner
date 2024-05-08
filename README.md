@@ -1,3 +1,8 @@
+> [!WARNING]  
+> **NOTE**: _This repository is no longer supported or updated. If you wish to continue to develop this code yourself, we recommend you fork it._</code>
+
+
+
 # Boustrophedon Planner
 Boustrophedon Planner is a coverage path planner that implements a modified cellular decomposition algorithm. The original can be found [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6806237/).
 
