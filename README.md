@@ -24,4 +24,4 @@ and returns a `StripingPlan` message which contains a list of waypoints to strip
 
 This repository is subject to GNU General Public License version 3 or later due to its dependencies.
 
-The geometric operations rely on CGAL which is restricted by GNU General Public License version 3 or later.
+The geometric operations rely on CGAL which is restricted by GNU Lesser General Public License (LGPL).
