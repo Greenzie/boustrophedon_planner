@@ -1,3 +1,8 @@
+> [!WARNING]  
+> **NOTE**: _This repository is no longer supported or updated. If you wish to continue to develop this code yourself, we recommend you fork it._</code>
+
+
+
 # Boustrophedon Planner
 Boustrophedon Planner is a coverage path planner that implements a modified cellular decomposition algorithm. The original can be found [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6806237/).
 
@@ -17,6 +22,6 @@ and returns a `StripingPlan` message which contains a list of waypoints to strip
 
 ## License
 
-This repository is subject to GNU General Public License version 3 or later due to its dependencies.
+This repository is subject to version 3 of the GNU Lesser General Public License or later due to its dependencies.
 
-The geometric operations rely on CGAL which is restricted by GNU General Public License version 3 or later.
+The geometric operations rely on CGAL which is restricted by version 3 of the GNU Lesser General Public License.
